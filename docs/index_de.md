@@ -1,20 +1,18 @@
 ---
-title: ZZZ
-identifier: intranda_step_ZZZ
-description: Step Plugin für ZZZ
+title: Generate ALTO IDs
+identifier: intranda_step_generate_alto_ids
+description: Dieses Script generiert fehlende ALTO IDs. Diese ALTO IDs werden im ALTO Editor verwendet um korrekt speichern zu können. Einige externe OCR Tools generieren diese IDs nicht. Um diese fehlenden IDs zu generieren kann dieses Plugin verwendet werden.
 published: false
 ---
 
 ## Einführung
-Diese Dokumentation erläutert das Plugin für ZZZ.
+Diese Dokumentation erläutert das Plugin zur Generierung von ALTO IDs.
 
 ## Installation
 Um das Plugin nutzen zu können, müssen folgende Dateien installiert werden:
 
 ```bash
-/opt/digiverso/goobi/plugins/step/plugin-step-ZZZ-base.jar
-/opt/digiverso/goobi/plugins/GUI/plugin-step-ZZZ-gui.jar
-/opt/digiverso/goobi/config/plugin_intranda_step_ZZZ.xml
+/opt/digiverso/goobi/plugins/step/plugin-step-generate-alto-ids-base.jar
 ```
 
 Nach der Installation des Plugins kann dieses innerhalb des Workflows für die jeweiligen Arbeitsschritte ausgewählt und somit automatisch ausgeführt werden. Ein Workflow könnte dabei beispielhaft wie folgt aussehen:
@@ -27,42 +25,10 @@ Für die Verwendung des Plugins muss dieses in einem Arbeitsschritt ausgewählt 
 
 
 ## Überblick und Funktionsweise
-ZZZ
+Beim Starten des Plugins werden alle ALTO Dateien auf fehlende IDs geprüft.
+Sollten fehlende IDs gefunden werden, wird zuerst ein Backup aller OCR Ergebnisse mitsamt der ALTO Dateien erstellt.
+Danach werden die fehlenden ALTO IDs in allen Dateien ergänzt.
 
 
 ## Konfiguration
-Die Konfiguration des Plugins erfolgt in der Datei `plugin_intranda_step_ZZZ.xml` wie hier aufgezeigt:
-
-{{CONFIG_CONTENT}}
-
-{{CONFIG_DESCRIPTION_PROJECT_STEP}}
-
-Parameter               | Erläuterung
-------------------------|------------------------------------
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
-``                      | 
+Dieses Plugin erfordert keine Konfiguration.

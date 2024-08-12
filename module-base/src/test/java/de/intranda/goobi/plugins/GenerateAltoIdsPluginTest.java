@@ -1,23 +1,17 @@
 package de.intranda.goobi.plugins;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import de.sub.goobi.config.ConfigurationHelper;
+import de.sub.goobi.helper.VariableReplacer;
+import de.sub.goobi.helper.enums.StepStatus;
+import de.sub.goobi.metadaten.MetadatenHelper;
+import de.sub.goobi.persistence.managers.MetadataManager;
+import de.sub.goobi.persistence.managers.ProcessManager;
 import org.easymock.EasyMock;
 import org.goobi.beans.Process;
 import org.goobi.beans.Project;
-import org.goobi.beans.Ruleset;
 import org.goobi.beans.Step;
 import org.goobi.beans.User;
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -29,15 +23,16 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.sub.goobi.config.ConfigurationHelper;
-import de.sub.goobi.helper.VariableReplacer;
-import de.sub.goobi.helper.enums.StepStatus;
-import de.sub.goobi.metadaten.MetadatenHelper;
-import de.sub.goobi.persistence.managers.MetadataManager;
-import de.sub.goobi.persistence.managers.ProcessManager;
-import ugh.dl.Fileformat;
-import ugh.dl.Prefs;
-import ugh.fileformats.mets.MetsMods;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MetadatenHelper.class, VariableReplacer.class, ConfigurationHelper.class, ProcessManager.class,
@@ -54,7 +49,6 @@ public class GenerateAltoIdsPluginTest {
     private File metadataDirectory;
     private Process process;
     private Step step;
-    private Prefs prefs;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -69,38 +63,25 @@ public class GenerateAltoIdsPluginTest {
         System.setProperty("log4j.configurationFile", log4jFile);
     }
 
-    @Test
-    public void testConstructor() throws Exception {
-        GenerateAltoIdsStepPlugin plugin = new GenerateAltoIdsStepPlugin();
-        assertNotNull(plugin);
-    }
-
-    @Test
-    public void testInit() {
-        GenerateAltoIdsStepPlugin plugin = new GenerateAltoIdsStepPlugin();
-        plugin.initialize(step, "something");
-        assertEquals(step.getTitel(), plugin.getStep().getTitel());
-    }
-
-    @Test
-    public void testVersion() throws IOException {
-        String s = "xyz";
-        assertNotNull(s);
-    }
-
     @Before
     public void setUp() throws Exception {
         metadataDirectory = folder.newFolder("metadata");
         processDirectory = new File(metadataDirectory + File.separator + "1");
         processDirectory.mkdirs();
         String metadataDirectoryName = metadataDirectory.getAbsolutePath() + File.separator;
-        Path metaSource = Paths.get(resourcesFolder, "meta.xml");
-        Path metaTarget = Paths.get(processDirectory.getAbsolutePath(), "meta.xml");
-        Files.copy(metaSource, metaTarget);
 
-        Path anchorSource = Paths.get(resourcesFolder, "meta_anchor.xml");
-        Path anchorTarget = Paths.get(processDirectory.getAbsolutePath(), "meta_anchor.xml");
-        Files.copy(anchorSource, anchorTarget);
+        Path ocrSource = Paths.get(resourcesFolder, "ocr");
+        Path ocrTarget = Paths.get(processDirectory.getAbsolutePath(), "ocr");
+        Files.walk(ocrSource)
+                .forEach(source -> {
+                    Path destination = Paths.get(ocrTarget.toString(), source.toString()
+                            .substring(ocrSource.toString().length()));
+                    try {
+                        Files.copy(source, destination);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         PowerMock.mockStatic(ConfigurationHelper.class);
         ConfigurationHelper configurationHelper = EasyMock.createMock(ConfigurationHelper.class);
@@ -111,24 +92,20 @@ public class GenerateAltoIdsPluginTest {
         EasyMock.expect(configurationHelper.isUseProxy()).andReturn(false).anyTimes();
         EasyMock.expect(configurationHelper.getGoobiContentServerTimeOut()).andReturn(60000).anyTimes();
         EasyMock.expect(configurationHelper.getMetadataFolder()).andReturn(metadataDirectoryName).anyTimes();
+        EasyMock.expect(configurationHelper.getProcessOcrAltoDirectoryName()).andReturn("test_process_alto").anyTimes();
+        EasyMock.expect(configurationHelper.getNumberOfBackups()).andReturn(10).anyTimes();
         EasyMock.expect(configurationHelper.getRulesetFolder()).andReturn(resourcesFolder).anyTimes();
-        EasyMock.expect(configurationHelper.getProcessImagesMainDirectoryName()).andReturn("00469418X_media").anyTimes();
         EasyMock.expect(configurationHelper.isUseMasterDirectory()).andReturn(true).anyTimes();
         EasyMock.expect(configurationHelper.getConfigurationFolder()).andReturn(resourcesFolder).anyTimes();
         EasyMock.expect(configurationHelper.getNumberOfMetaBackups()).andReturn(0).anyTimes();
         EasyMock.replay(configurationHelper);
 
         PowerMock.mockStatic(VariableReplacer.class);
-        EasyMock.expect(VariableReplacer.simpleReplace(EasyMock.anyString(), EasyMock.anyObject())).andReturn("00469418X_media").anyTimes();
+        EasyMock.expect(VariableReplacer.simpleReplace(EasyMock.anyString(), EasyMock.anyObject())).andReturn("test_process_alto").anyTimes();
         PowerMock.replay(VariableReplacer.class);
-        prefs = new Prefs();
-        prefs.loadPrefs(resourcesFolder + "ruleset.xml");
-        Fileformat ff = new MetsMods(prefs);
-        ff.read(metaTarget.toString());
 
         PowerMock.mockStatic(MetadatenHelper.class);
         EasyMock.expect(MetadatenHelper.getMetaFileType(EasyMock.anyString())).andReturn("mets").anyTimes();
-        EasyMock.expect(MetadatenHelper.getFileformatByName(EasyMock.anyString(), EasyMock.anyObject())).andReturn(ff).anyTimes();
         EasyMock.expect(MetadatenHelper.getMetadataOfFileformat(EasyMock.anyObject(), EasyMock.anyBoolean()))
                 .andReturn(Collections.emptyMap())
                 .anyTimes();
@@ -141,15 +118,6 @@ public class GenerateAltoIdsPluginTest {
         PowerMock.replay(ConfigurationHelper.class);
 
         process = getProcess();
-
-        Ruleset ruleset = PowerMock.createMock(Ruleset.class);
-        ruleset.setTitel("ruleset");
-        ruleset.setDatei("ruleset.xml");
-        EasyMock.expect(ruleset.getDatei()).andReturn("ruleset.xml").anyTimes();
-        process.setRegelsatz(ruleset);
-        EasyMock.expect(ruleset.getPreferences()).andReturn(prefs).anyTimes();
-        PowerMock.replay(ruleset);
-
     }
 
     public Process getProcess() {
@@ -196,5 +164,14 @@ public class GenerateAltoIdsPluginTest {
         mediaDirectory.mkdir();
 
         // TODO add some file
+    }
+
+    @Test
+    public void testCorrectlyBackupOcrDirectoryAndGenerateMissingIds() throws IOException, JDOMException {
+        GenerateAltoIdsStepPlugin plugin = new GenerateAltoIdsStepPlugin();
+        plugin.initialize(step, "something");
+        plugin.run();
+
+        assertFalse(plugin.altoFileHasMissingIds(Path.of(processDirectory.getAbsolutePath(), "ocr", "test_process_alto", "0001.xml")));
     }
 }
