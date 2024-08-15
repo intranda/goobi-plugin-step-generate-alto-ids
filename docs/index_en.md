@@ -1,7 +1,7 @@
 ---
 title: Generate ALTO IDs
 identifier: intranda_step_generate_alto_ids
-description: The script generates missing ALTO IDs. This is required for the ALTO editor to work properly. Some external OCR tools don't provide these ALTO IDs. This script can then be used to generate them afterwards.
+description: The Step plugin for Goobi workflow generates missing ALTO IDs. This is required for the ALTO editor to work properly. Some external OCR tools don't provide these ALTO IDs. This plugin can then be used to generate them afterwards.
 published: true
 ---
 
