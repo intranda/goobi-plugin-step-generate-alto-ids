@@ -2,7 +2,7 @@
 title: Generate ALTO IDs
 identifier: intranda_step_generate_alto_ids
 description: Dieses Script generiert fehlende ALTO IDs. Diese ALTO IDs werden im ALTO Editor verwendet um korrekt speichern zu können. Einige externe OCR Tools generieren diese IDs nicht. Um diese fehlenden IDs zu generieren kann dieses Plugin verwendet werden.
-published: false
+published: true
 ---
 
 ## Einführung
