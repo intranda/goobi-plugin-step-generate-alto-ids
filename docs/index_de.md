@@ -6,7 +6,7 @@ published: true
 ---
 
 ## Einführung
-Diese Dokumentation erläutert das Plugin zur Generierung von ALTO IDs.
+In dieser Dokumentation wird das Plugin zur Erzeugung fehlender ALTO-IDs erläutert. Dies ist erforderlich, damit der ALTO-Editor richtig funktioniert. Einige externe OCR-Tools stellen diese ALTO-IDs nicht zur Verfügung. Dieses Plugin kann dann verwendet werden, um sie nachträglich zu erzeugen.
 
 ## Installation
 Um das Plugin nutzen zu können, müssen folgende Dateien installiert werden:
