@@ -1,7 +1,7 @@
 ---
 title: Generate ALTO IDs
 identifier: intranda_step_generate_alto_ids
-description: Dieses Step Plugin für Goobi-Workflow generiert fehlende ALTO-IDs. Dies ist erforderlich, damit der ALTO-Editor richtig funktioniert. Einige externe OCR-Tools stellen diese ALTO-IDs nicht zur Verfügung. Mit diesem Plugin können sie dann nachträglich erzeugt werden.
+description: Dieses Step Plugin dient zur Generierung von fehlenden ALTO-IDs.
 published: true
 ---
 
