@@ -3,6 +3,10 @@ title: Generate ALTO IDs
 identifier: intranda_step_generate_alto_ids
 description: This step plugin is used to generate missing ALTO IDs. 
 published: true
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 
 ## Introduction
