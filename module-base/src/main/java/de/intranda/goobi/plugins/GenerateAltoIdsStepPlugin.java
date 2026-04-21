@@ -214,7 +214,7 @@ public class GenerateAltoIdsStepPlugin implements IStepPluginVersion2 {
 
     private Element getXmlRootElementOfFile(Path altoFile) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(altoFile.toString());
+        Document document = builder.build(altoFile.toFile());
         return document.getRootElement();
     }
 
